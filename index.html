@@ -3,16 +3,6 @@
 		<title> Web VR</title>
 		<script src ="aframe.min.js"></script>
 		<script >
-			//register autorefresh component
-			AFRAME.registerComponent('raycaster-autorefresh', {
-				init: function() {
-					var el = this.el;
-					this.el.addEventListener('model-loaded', function() {
-						var cursorEl = el.querySelector('[raycaster]');
-						cursorEl.component.raycaster.refreshObjects();
-					});
-				}
-			});
 			//register fusable component
 			AFRAME.registerComponent('fusable', {
 				init: function () {
@@ -38,8 +28,35 @@
 					});
 				}
 			});
-		</script>
-	</head>
+
+			//pick up
+			AFRAME.registerComponent('can-pickup', {
+				init: function () {
+					this.click = this.click.bind(this);
+					this.el.addEventListener('click', this.click);
+				},
+				click: function(e){
+					var activeItem = document.querySelector('#active-item');
+					if(activeItem !== this.el) {
+						setActiveItem(this.el);
+					}
+				},
+			remove: function() {
+				this.el.removeEventListener('click', this.click);
+			}
+		});
+
+		function setActiveItem(item) {
+			item.setAttribute('id', 'active-item');
+			var camera = document.querySelector('a-camera');
+			camera.appendChild(item);
+			item.setAttribute('position', '-0.25 0 -0.5');
+			item.setAttribute('rotation', '-90 0 0');
+			item.setAttribute('scale', '0.1 0.1 0.1');
+			item.dispatchEvent(new Event('activate-item'));
+		}
+	</script>
+</head>
 	<body>
 		<!-- HTML A-frame goes here -->
 		<!-- the world-->
@@ -49,7 +66,8 @@
 				<a-asset-item id="wall" src="resources/wall.gltf"></a-asset-item>
 				<img id="carpet" src="resources/carpet.jpg">
 				<a-asset-item id="sofa" src="resources/burlap_sofa.gltf"></a-asset-item>
-				<a-asset-item id="door" src="resources/door.gltf"></a-asset-item> 
+				<a-asset-item id="door" src="resources/door.gltf"></a-asset-item>
+				<a-asset-item id="key" src="resources/key.gltf"></a-asset-item>
 			</a-assets>
 			<!-- light controls shade and visibility -->
 			<a-light type="directional" color="#FFF"intensity="0.8" position="2 5 0" rotation="0 0 0">
@@ -88,7 +106,10 @@
 			<a-gltf-model scale="1.7 1.7 1.7" position="-3.27 1.5 -5.63" rotation="0 0 0" src="#door" door-listener fusable clickable shadow>
 				<a-animation begin="open-door" attribute="rotation" to="0 -50 0" dur="1500"></a-animation>
 				<a-animation begin="open-door" attribute="position" to="-2.05 1.5 -5.5"dur="1500"></a-animation>
+				<a-gltf-model scale="1.7 1.7 1.7" position="0.2 1.5 -5.6" rotation="0 0 0" src="#wall" shadow></a-gltf-model>
 			</a-gltf-model>
-		</a-scene> 
+			<!--Key-->
+			<a-gltf-model type="key" position="-3 1.5 0.1" rotation="0 50 0" scale="0.1 0.1 0.1" src="#key" shadow can-pickup fusable></a-gltf-model>
+		</a-scene>
 	</body>
 </html>
