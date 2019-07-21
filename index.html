@@ -8,7 +8,7 @@
 				init: function() {
 					var el = this.el;
 					this.el.addEventListener('model-loaded', function() {
-						var cursorEl = el.querySelecetor('[raycaster]');
+						var cursorEl = el.querySelector('[raycaster]');
 						cursorEl.component.raycaster.refreshObjects();
 					});
 				}
